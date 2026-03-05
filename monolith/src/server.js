@@ -34,8 +34,8 @@ app.get("/service/orders/:id", (req, res) => {
   return res.json(order);
 });
 
-//Client side routing fix on page refresh or direct browsing to non-root directory
-app.get("/*", (req, res) => {
+// Client-side routing fallback for Express 5 wildcard syntax.
+app.get("/{*path}", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "index.html"), (err) => {
     if (err) {
       res.status(500).send(err);

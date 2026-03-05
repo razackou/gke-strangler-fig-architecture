@@ -6,14 +6,19 @@
 
 /logs
 
+
+
 #commit -m "adding frontend" on march 06th (friday)
-/react-app           
+/react-app          
 monolith/public
 
+
 ##edit the deployment.yml first and ensure that it's running on gke then
-#commit -m "adding monolith deploy kubernetes manifests" on march 07th (saturday) 
+#commit -m "adding monolith deploy kubernetes manifests" on march 07th (saturday)
 /k8s
 /k8s/monolith
+
+
 
 
 #commit -m "Migrate Frontend to microservice"
@@ -21,4 +26,4 @@ monolith/public
 #commit -m "Migrate orders to a microservice"
 /k8s/orders
 #commit -m "Migrate Products to microservice"
-/k8s/products                 
+/k8s/products     
