@@ -7,18 +7,25 @@
 /logs
 
 
-
-##edit the deployment.yml first and ensure that it's running on gke then
-#commit -m "adding monolith deploy kubernetes manifests" on march 07th (saturday)
-/k8s
-/k8s/monolith
-
-
-
-
-#commit -m "Migrate Frontend to microservice"
+/react-app/.env.production
+/microservices
+#commit -m "Frontend to microservice" on march 09th (monday)
 /k8s/frontend
-#commit -m "Migrate orders to a microservice"
+
+#commit -m "orders to a microservice" on march 09th (monday)
 /k8s/orders
-#commit -m "Migrate Products to microservice"
-/k8s/products     
+
+#commit -m "Products to microservice and rewriting using FastAPI" on march 09th (monday)
+/k8s/products  
+backendconfigs.yml  
+ingress.yml
+/assets/microservices-deployed-and-running-gke.png
+
+
+#commit -m “adding docker-compose file for local testing” on march 11 (wednesday) 
+docker-compose.yml
+/assets/microservices-docker-compose-up.png
+
+#Review and correct the README file to reflect the project 
+#commit -m “adding diagrams to README”  (march 14)
+#commit -m “Finalizing README”  (march 15)

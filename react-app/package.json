@@ -15,6 +15,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "build:microservices": "env-cmd -f .env.production vite build && node scripts/post-build.js ./build ../microservices/src/frontend/public",
     "build:monolith": "env-cmd -f .env.monolith vite build && node scripts/post-build.js ./build ../monolith/public",
     "test": "vitest run --passWithNoTests"
   },
