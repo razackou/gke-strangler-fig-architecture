@@ -1,5 +1,7 @@
 # Kubernetes Application Modernization on GKE
+
 ## From Monolith to Microservices – Architecture Patterns & Production Readiness
+
 A decision-oriented architectural case study on migrating a Node.js monolith to a polyglot (FastAPI/Node.js) microservices environment on GKE using the Strangler Fig pattern.
 
 ---
@@ -11,14 +13,15 @@ A decision-oriented architectural case study on migrating a Node.js monolith to 
 3. [Initial Architecture (Monolith)](#3-initial-architecture-monolith)
 4. [Target Architecture (Microservices on GKE)](#4-target-architecture-microservices-on-gke)
 5. [Migration Strategy](#5-migration-strategy-strangler-fig-pattern)
-6. [Key Architectural Decisions](#6-key-architectural-decisions)
-7. [Observability and Day-2 Operations](#7-observability-and-day-2-operations)
-8. [Tradeoffs and Limitations](#8-tradeoffs-and-limitations)
-9. [Improvements and Next Steps](#9-improvements-and-next-steps)
-10. [Key Takeaways](#10-key-takeaways)
-11. [Technologies Stack](#11-technologies-stack)
-12. [Target Audience](#12-target-audience)
-13. [License](#13-license)
+6. [Implementation Details: Polyglot Microservices](#6-implementation-details-polyglot-microservices)
+7. [Key Architectural Decisions](#7-key-architectural-decisions)
+8. [Observability and Day-2 Operations](#8-observability-and-day-2-operations)
+9. [Tradeoffs and Limitations](#9-tradeoffs-and-limitations)
+10. [Improvements and Next Steps](#10-improvements-and-next-steps)
+11. [Key Takeaways](#11-key-takeaways)
+12. [Technologies Stack](#12-technologies-stack)
+13. [Target Audience](#13-target-audience)
+14. [License](#14-license)
 
 ---
 
@@ -35,6 +38,7 @@ Beyond basic orchestration, this project explores the architectural tradeoffs an
 ### 2.1 The Challenge
 
 Legacy monolithic architectures often struggle in cloud-native environments due to:
+
 - Tight Coupling: Interdependent components that hinder agility.
 - Coarse-grained Scaling: Inability to scale specific functions without scaling the entire stack.
 - High Deployment Risk: Small changes requiring full-system redeployments.
@@ -91,24 +95,25 @@ To avoid a high-risk “big bang” rewrite, the modernization followed an incre
 
 ```mermaid
 sequenceDiagram
-    participant Browser as Client Browser (React)
+    participant Browser as Client Browser (React + Vite)
     participant Ingress as GKE Ingress
-    participant FastAPI as Orders Service (Python)
-    
-    Note over Browser, FastAPI: Contract-First Migration
-    
-    Browser->>Ingress: GET /api/orders
+    participant FastAPI as Products Service (FastAPI/Python)
+
+    Note over Browser, FastAPI: Incremental domain extraction via Strangler Fig
+
+    Browser->>Ingress: GET /api/products
     Ingress->>FastAPI: Forward Request (ClusterIP)
-    
+
     activate FastAPI
-    Note right of FastAPI: Pydantic Validation
+    Note right of FastAPI: Pydantic validation + business logic
     FastAPI-->>Ingress: JSON Response (Status: 200)
     deactivate FastAPI
-    
-    Ingress-->>Browser: JSON Data (ORD-XXX-FASTAPI)
-    
-    Note over Browser: Frontend renders orders without code change
+
+    Ingress-->>Browser: JSON Data (PRD-XXX-FASTAPI)
+
+    Note over Browser: Existing UI consumes the same API contract
 ```
+
 The Strangler Fig Transition
 
 ### 5.1 Execution Steps
@@ -119,7 +124,7 @@ The Strangler Fig Transition
 4. Validate and Stabilize: Monitor performance, logs, and user impact in the live environment before proceeding.
 5. Decommission Legacy Components: Repeat the process until the monolithic core is fully retired.
 
-## 5.2 key Benefits
+### 5.2 Key Benefits
 
 - Risk Mitigation: Issues are isolated by domain rather than affecting the entire system.
 - Zero Downtime: The monolith and new services coexist, ensuring continuous operation.
@@ -128,116 +133,132 @@ The Strangler Fig Transition
 ```mermaid
 graph TD
     User((External User)) --> Ingress{GKE Ingress Controller}
-    
-    subgraph GKE_Cluster [Google Kubernetes Engine Cluster]
+
+    subgraph GKE_Cluster [Google GKE Cluster]
         direction TB
-        Ingress -- "path: /api/orders" --> SVC_Orders[Service: Orders]
-        Ingress -- "path: /" --> SVC_Mono[Service: Monolith]
-        
+        Ingress -- "path: /api/products" --> SVC_Products[Service: Products]
+        Ingress -- "path: / (default)" --> SVC_Mono[Service: Monolith]
+
         subgraph Modern_Stack [Modernized Domain]
-            SVC_Orders --> Pod_FastAPI[Pod: FastAPI / Python]
+            SVC_Products --> Pod_FastAPI[Pod: Products / FastAPI Python]
         end
-        
+
         subgraph Legacy_Stack [Legacy Domain]
             SVC_Mono --> Pod_Node[Pod: Monolith / Node.js]
         end
     end
 
-    style Modern_Stack fill:#e1f5fe,stroke:#01579b
-    style Legacy_Stack fill:#fff3e0,stroke:#e65100
-    style Ingress fill:#f3e5f5,stroke:#4a148c
+    %% Styling (high-contrast for readability)
+    style GKE_Cluster fill:#f8fbff,stroke:#1f6feb,stroke-width:2px,color:#0b1f33
+    style Modern_Stack fill:#eefaf2,stroke:#1a7f37,stroke-width:1px,color:#0f2a1a
+    style Legacy_Stack fill:#fff4e5,stroke:#b45309,stroke-width:1px,color:#3f2a00
+    style Ingress fill:#e0f2fe,stroke:#0369a1,stroke-width:2px,color:#082f49
+    style SVC_Products fill:#dcfce7,stroke:#15803d,stroke-width:1px,color:#0f2a1a
+    style Pod_FastAPI fill:#dcfce7,stroke:#15803d,stroke-width:1px,color:#0f2a1a
+    style SVC_Mono fill:#ffedd5,stroke:#c2410c,stroke-width:1px,color:#3f2a00
+    style Pod_Node fill:#ffedd5,stroke:#c2410c,stroke-width:1px,color:#3f2a00
 ```
+
 The Strangler Fig Transition Diagram
 
 ---
-<!--
-## 5. Implementation Details: Polyglot Microservices
 
-To demonstrate the flexibility of a microservices architecture, the Orders Service was re-engineered using Python 3.11 and FastAPI. This decision illustrates a real-world "Strangler Fig" scenario where legacy code is not just moved, but modernized using a different technology stack.
+## 6. Implementation Details: Polyglot Microservices
 
-### 5.1 Technical Choices
+To demonstrate the flexibility of a microservices architecture, the Products Service was re-engineered using Python 3.11 and FastAPI. This decision illustrates a real-world "Strangler Fig" scenario where legacy code is not just moved, but modernized using a different technology stack.
+
+### 6.1 Technical Choices
 
 - **FastAPI Framework**: Selected for its high performance (Asynchronous ASGI), native data validation via Pydantic, and automatic OpenAPI documentation.
 - **Contract-First Migration**: The FastAPI service was designed to strictly adhere to the original JSON schema expected by the React Frontend, ensuring zero-downtime and transparent migration for the end-user.
 - **Containerization**: Implemented using Multi-stage Docker builds to optimize image size and reduce the attack surface in the GKE environment.
 
-### 5.2 Data Contract (Pydantic Model)
+### 6.2 Data Contract (Pydantic Model)
 
 The service implements a strict schema to maintain compatibility with the legacy frontend:
 
 ```Python
-class Order(BaseModel):
+class Product(BaseModel):
     id: str
-    date: datetime
-    items: List[OrderItem]
-    total: float
-    status: str = "PROCESSED_BY_FASTAPI"
+    name: str
+    description: str
+    picture: str
+    cost: float
+    categories: list[str]
 ```
 
-### 5.3 Traffic Shifting (Ingress)
+### 6.3 Traffic Shifting (Ingress)
 
-The Nginx Ingress Controller acts as the routing engine. By applying path-based rules, traffic is incrementally diverted:
-1. Default Rule (`/`): Routes to the legacy Node.js Monolith.
-2. Specific Rule (`/api/orders`): Routes to the new FastAPI Microservice.
+The GKE Ingress controller acts as the routing engine. By applying path-based rules, traffic is incrementally diverted:
+
+1. Default Rule (`/`): Routes to the Frontend service.
+2. Specific Rule (`/api/products`): Routes to the new FastAPI Products microservice.
+
 ---
--->
-## 6. Key Architectural Decisions
+
+## 7. Key Architectural Decisions
 
 ```mermaid
 graph TB
+    User((External User)) --> Ingress{GKE Ingress Controller}
+
     subgraph GCP_Cloud [Google Cloud Platform]
+        direction TB
+
         subgraph GKE_Cluster [GKE Cluster - Production]
             direction TB
-            Ingress{GKE Ingress Controller}
-            
+
             subgraph Services_Layer [Service Abstraction]
                 SVC_Front[Service: Frontend]
                 SVC_Orders[Service: Orders]
                 SVC_Products[Service: Products]
             end
-            
+
             subgraph Pods_Layer [Compute Layer - Distributed]
-                Pod_React[Pods: React/Node]
-                Pod_FastAPI[Pods: FastAPI/Python]
-                Pod_Node[Pods: Node.js]
+                Pod_Front[Pods: Frontend / Node.js]
+                Pod_Orders[Pods: Orders / Node.js]
+                Pod_Products[Pods: Products / FastAPI Python]
             end
-            
-            subgraph Config_Layer [Management Layer]
-                CM[ConfigMaps]
-                Sec[Secrets]
-            end
+
         end
-        
-        GAR[(Artifact Registry)]
+
+        Registry[(Google Artifact Registry)]
     end
 
     %% Routing Logic
-    Ingress --> SVC_Front
-    Ingress --> SVC_Orders
-    Ingress --> SVC_Products
-    
-    %% Service to Pod Mapping
-    SVC_Front --> Pod_React
-    SVC_Orders --> Pod_FastAPI
-    SVC_Products --> Pod_Node
-    
-    %% Configuration Injection
-    CM -.-> Pods_Layer
-    Sec -.-> Pods_Layer
-    
-    %% Image Pulls
-    GAR -.-> Pods_Layer
+    Ingress -- "path: /" --> SVC_Front
+    Ingress -- "path: /api/orders" --> SVC_Orders
+    Ingress -- "path: /api/products" --> SVC_Products
 
-    %% Styling
-    style GCP_Cloud fill:#f8f9fa,stroke:#4285f4,stroke-width:2px
-    style GKE_Cluster fill:#ffffff,stroke:#34a853,stroke-width:2px
-    style Ingress fill:#f3e5f5,stroke:#4a148c
-    style Modern_Stack fill:#e1f5fe,stroke:#01579b
-    style GAR fill:#fff3e0,stroke:#e65100
+    %% Service to Pod Mapping
+    SVC_Front --> Pod_Front
+    SVC_Orders --> Pod_Orders
+    SVC_Products --> Pod_Products
+
+    %% Image Pulls
+    Registry -.-> Pod_Front
+    Registry -.-> Pod_Orders
+    Registry -.-> Pod_Products
+
+    %% Styling (high-contrast for readability)
+    style GCP_Cloud fill:#f7f8fa,stroke:#4285f4,stroke-width:2px,color:#0b1f33
+    style GKE_Cluster fill:#f8fbff,stroke:#1f6feb,stroke-width:2px,color:#0b1f33
+    style Services_Layer fill:#eef6ff,stroke:#1f6feb,stroke-width:1px,color:#0b1f33
+    style Pods_Layer fill:#eefaf2,stroke:#1a7f37,stroke-width:1px,color:#0f2a1a
+    style Ingress fill:#fff4e5,stroke:#b45309,stroke-width:2px,color:#3f2a00
+    style Registry fill:#f3f4f6,stroke:#374151,stroke-width:2px,color:#111827
+
+    style SVC_Front fill:#dbeafe,stroke:#1d4ed8,stroke-width:1px,color:#0b1f33
+    style SVC_Orders fill:#dbeafe,stroke:#1d4ed8,stroke-width:1px,color:#0b1f33
+    style SVC_Products fill:#dbeafe,stroke:#1d4ed8,stroke-width:1px,color:#0b1f33
+    style Pod_Front fill:#dcfce7,stroke:#15803d,stroke-width:1px,color:#0f2a1a
+    style Pod_Orders fill:#dcfce7,stroke:#15803d,stroke-width:1px,color:#0f2a1a
+    style Pod_Products fill:#dcfce7,stroke:#15803d,stroke-width:1px,color:#0f2a1a
 ```
+
 Target State Diagram
 
-### 6.1 Kubernetes as the Control Plane
+### 7.1 Kubernetes as the Control Plane
 
 Kubernetes was selected to provide:
 
@@ -248,7 +269,7 @@ Kubernetes was selected to provide:
 
 ---
 
-### 6.2 Service Communication Model
+### 7.2 Service Communication Model
 
 - Internal services use **ClusterIP** for private, internal-only networking.
 - Service discovery is managed via **Kubernetes DNS**.
@@ -256,7 +277,7 @@ Kubernetes was selected to provide:
 
 ---
 
-### 6.3 Ingress-Based Traffic Management
+### 7.3 Ingress-Based Traffic Management
 
 A centralized Ingress layer serves as the single entry point to the cluster:
 
@@ -265,27 +286,27 @@ A centralized Ingress layer serves as the single entry point to the cluster:
 
 ---
 
-### 6.4 Configuration and Secrets Management
+### 7.4 Configuration and Secrets Management
 
 - **ConfigMaps**: Externalize application settings to keep images environment-agnostic.
 - **Kubernetes Secrets**: Securely inject sensitive data (API keys, DB credentials) at runtime.
-- **Benefit**: Enables environment-specific configuration without the need to rebuild container images.
+- **Status**: Planned enhancement for a future iteration.
 
 ```mermaid
 graph LR
     subgraph Workstation [Developer Environment]
         Code[Source Code] --> DF[Dockerfile]
     end
-    
-    subgraph CI_CD [Cloud Build Pipeline]
+
+    subgraph CI_CD [Planned CI/CD Pipeline]
         DF --> Build{Build & Test}
         Build --> Push[Push Image]
     end
-    
+
     subgraph Registry [Google Artifact Registry]
         Push --> Img[Immutable Image v1.0.0]
     end
-    
+
     subgraph Runtime [GKE Production]
         Img --> Deploy[Kubernetes Deployment]
         Deploy --> Replicas[Running Pods]
@@ -294,11 +315,12 @@ graph LR
     style Registry fill:#f1f8e9,stroke:#33691e
     style Runtime fill:#e3f2fd,stroke:#0d47a1
 ```
-Workflow Diagram
+
+Planned Delivery Workflow (Future State)
 
 ---
 
-### 6.5 Health Checks and Resilience
+### 7.5 Health Checks and Resilience
 
 Each service implements specific probes:
 
@@ -307,7 +329,7 @@ Each service implements specific probes:
 
 ---
 
-## 7. Observability and Day-2 Operations
+## 8. Observability and Day-2 Operations
 
 The architecture is purposefully designed to integrate with modern observability stacks:
 
@@ -317,7 +339,7 @@ The architecture is purposefully designed to integrate with modern observability
 
 ---
 
-## 8. Tradeoffs and Limitations
+## 9. Tradeoffs and Limitations
 
 Adopting microservices introduces additional complexity:
 
@@ -328,10 +350,11 @@ Adopting microservices introduces additional complexity:
 
 ---
 
-## 9. Improvements and Next Steps
+## 10. Improvements and Next Steps
 
 Potential future enhancements include:
 
+- Implement ConfigMaps and Kubernetes Secrets in manifests for runtime configuration and secret injection
 - Service mesh integration (mTLS, traffic shaping)
 - Progressive delivery strategies (canary, blue/green)
 - CI/CD pipelines with automated promotion
@@ -339,7 +362,7 @@ Potential future enhancements include:
 
 ---
 
-## 10. Key Takeaways
+## 11. Key Takeaways
 
 - **Architecture First**: Modernization is an architectural and organizational shift, not just a "lift and shift" to the cloud.
 - **Risk Management**: The Strangler Fig pattern is the gold standard for reducing migration risk.
@@ -347,28 +370,16 @@ Potential future enhancements include:
 
 ---
 
-## 11. Technologies Stack
+## 12. Technologies Stack
 
 - Google Kubernetes Engine (GKE)
 - Kubernetes (Deployments, Services, Ingress)
 - Docker
-- Cloud Build
-- ConfigMaps and Secrets
-
-
-
-|Category	            |Tool / Technology                      |
-|-----------------------|---------------------------------------|
-|**Orchestration**	    |Google Kubernetes Engine (GKE)         |
-|**Containerization**	|Docker                                 |
-|**CI/CD**	            |Google Cloud Build                     |
-|**Configuration**	    |Kubernetes ConfigMaps & Secrets        |
-|**Traffic**	        |~~NGINX Ingress Controller /~~ GKE Ingress |
-
+- Google Artifact Registry
 
 ---
 
-## 12. Target Audience
+## 13. Target Audience
 
 - Cloud Architects
 - Solution Architects
@@ -376,6 +387,6 @@ Potential future enhancements include:
 - Technical interviewers evaluating system design and architectural decision-making
 - Engineers interested in enterprise-grade cloud architecture patterns
 
-## 13. License
+## 14. License
 
 This project is licensed under the MIT License.
