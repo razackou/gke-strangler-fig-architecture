@@ -8,11 +8,6 @@
 
 
 
-#commit -m "adding frontend" on march 06th (friday)
-/react-app          
-monolith/public
-
-
 ##edit the deployment.yml first and ensure that it's running on gke then
 #commit -m "adding monolith deploy kubernetes manifests" on march 07th (saturday)
 /k8s
