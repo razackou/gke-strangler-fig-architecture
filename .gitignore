@@ -7,9 +7,6 @@
 /logs
 
 
-#commit -m "Extracting Products as Node.js microservice" on march 11 (wednesday) 
-/microservices/src/products
-/k8s/products  
 
 #commit -m "Migrating Frontend to microservice" on march 11 (wednesday) 
 /microservices/src/frontend
