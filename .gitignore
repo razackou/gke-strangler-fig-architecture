@@ -8,10 +8,6 @@
 
 
 
-#commit -m "Migrating Frontend to microservice" on march 11 (wednesday) 
-/microservices/src/frontend
-/k8s/frontend
-
 #commit -m "Finalizing kubernetes ingress" march 11 (wednesday) 
 /react-app/.env.production 
 /k8s/ingress.yml
