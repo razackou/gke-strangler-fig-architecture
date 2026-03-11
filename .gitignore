@@ -7,10 +7,6 @@
 /logs
 
 
-#commit -m "Extracting orders to a microservice behind ingress" march 11 (wednesday) 
-/microservices/src/orders
-/k8s/orders
-
 #commit -m "Extracting Products as Node.js microservice" on march 11 (wednesday) 
 /microservices/src/products
 /k8s/products  
@@ -21,21 +17,32 @@
 
 #commit -m "Finalizing kubernetes ingress" march 11 (wednesday) 
 /react-app/.env.production 
-ingress.yml
-backendconfigs.yml 
+/k8s/ingress.yml
+/k8s/backendconfigs.yml 
 /microservices/package-lock.json
 /microservices/package.json
 /microservices/.gitignore
 /assets/microservices-deployed-and-running-gke.png
 
-#commit -m “adding docker-compose file for local testing” on march 12 (thursday)  
+#commit -m "adding basic prometheus and grafana monitoring" march 12 (thursday)  
+/k8s/monitoring/monitoring.yml
+
+#commit -m “adding docker-compose file for local testing” on march 13th (friday) 
 docker-compose.yml
 /assets/microservices-docker-compose-up.png
+/assets/prometheus-grafana-monitoring-dashboard.png
 
-#commit -m "migrate products service from Node.js to FastAPI" on march 13th (friday)
+#commit -m "migrate products service from Node.js to FastAPI" on march 14th (saturday)
 buildx build --push -t northamerica-northeast1-docker.pkg.dev/gke-strangler-fig-architecture/reporazakou/products:2.0 .
 
 
 #Review and correct the README file to reflect the project 
-#commit -m “adding diagrams to README”  (march 15, sunday)
+#commit -m “adding screenshots to README”  (march 15, sunday)
+/assets/app-api-route-call.png
+/assets/app-frontend-loads.png
+/assets/google-artifact-registry.png
+/assets/ingress.png
+/assets/kubernetes-monitoring-health-snapshot.png
+/assets/kubernetes-workload-health-snapshot.png
+/assets/prometheus-targets-page.png
 #commit -m “Finalizing README”  (march 16, Monday)

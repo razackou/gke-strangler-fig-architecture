@@ -18,10 +18,11 @@ A decision-oriented architectural case study on migrating a Node.js monolith to 
 8. [Observability and Day-2 Operations](#8-observability-and-day-2-operations)
 9. [Tradeoffs and Limitations](#9-tradeoffs-and-limitations)
 10. [Improvements and Next Steps](#10-improvements-and-next-steps)
-11. [Key Takeaways](#11-key-takeaways)
-12. [Technologies Stack](#12-technologies-stack)
-13. [Target Audience](#13-target-audience)
-14. [License](#14-license)
+11. [Evidence and Screenshots](#11-evidence-and-screenshots)
+12. [Key Takeaways](#12-key-takeaways)
+13. [Technologies Stack](#13-technologies-stack)
+14. [Target Audience](#14-target-audience)
+15. [License](#15-license)
 
 ---
 
@@ -337,6 +338,42 @@ The architecture is purposefully designed to integrate with modern observability
 - **Metrics-based Autoscaling**: Using Horizontal Pod Autoscalers (HPA) to react to load.
 - **Service-level Monitoring**: Tracking health and latency across distributed boundaries.
 
+```mermaid
+graph LR
+    Frontend[Frontend Service] -->|/metrics| Prometheus[Prometheus]
+    Orders[Orders Service] -->|/metrics| Prometheus
+    Products[Products Service] -->|/metrics| Prometheus
+    Prometheus --> Grafana[Grafana Dashboards]
+    Prometheus -. planned .-> Alerting[Alert Rules]
+
+    style Prometheus fill:#fde68a,stroke:#b45309,stroke-width:1px,color:#3f2a00
+    style Grafana fill:#dbeafe,stroke:#1d4ed8,stroke-width:1px,color:#0b1f33
+    style Alerting fill:#fee2e2,stroke:#b91c1c,stroke-width:1px,color:#3f1111
+```
+
+Observability Flow Diagram
+
+### 8.1 Basic Monitoring Stack (Implemented)
+
+This repository includes a lightweight monitoring starter under `k8s/monitoring/monitoring.yml`:
+
+- **Prometheus**: Scrapes `/metrics` from `frontend`, `orders`, and `products` services.
+- **Grafana**: Pre-provisioned Prometheus datasource and a starter dashboard (`Microservices Overview`).
+
+Deploy the monitoring stack:
+
+```bash
+kubectl apply -f k8s/monitoring/monitoring.yml
+```
+
+Access Grafana locally:
+
+```bash
+kubectl -n monitoring port-forward svc/grafana 3000:3000
+```
+
+Default Grafana credentials (for demo only): `admin` / `admin123`.
+
 ---
 
 ## 9. Tradeoffs and Limitations
@@ -362,7 +399,65 @@ Potential future enhancements include:
 
 ---
 
-## 11. Key Takeaways
+## 11. Evidence and Screenshots
+
+<!--
+### 11.1 Platform and Deployment State
+
+Monolith running on GKE baseline:
+
+![Monolith Deployed on GKE](assets/monolith-deployed-and-running-gke.png)
+
+Microservices running on GKE:
+
+![Microservices Deployed on GKE](assets/microservices-deployed-and-running-gke.png)
+
+Kubernetes workload health snapshot:
+
+![Kubernetes Workload Health](assets/kubernetes-workload-health-snapshot.png)
+
+Ingress with external endpoint and routing:
+
+![Ingress Rules and External IP](assets/ingress.png)
+
+### 11.2 Runtime Validation
+
+Frontend route loads successfully:
+
+![Frontend Route Loads](assets/app-frontend-loads.png)
+
+API route call returns service data:
+
+![API Route Call](assets/app-api-route-call.png)
+
+### 11.3 Registry and Local Execution
+
+Google Artifact Registry repository view:
+
+![Google Artifact Registry](assets/google-artifact-registry.png)
+
+Local docker-compose stack up:
+
+![Docker Compose Local Stack](assets/microservices-docker-compose-up.png)
+
+### 11.4 Observability Evidence
+
+Prometheus targets page with scrape jobs:
+
+![Prometheus Targets Page](assets/prometheus-targets-page.png)
+
+Grafana monitoring dashboard:
+
+![Prometheus and Grafana Dashboard](assets/prometheus-grafana-monitoring-dashboard.png)
+
+Monitoring namespace health snapshot:
+
+![Monitoring Health Snapshot](assets/kubernetes-monitoring-health-snapshot.png)
+-->
+
+---
+
+## 12. Key Takeaways
 
 - **Architecture First**: Modernization is an architectural and organizational shift, not just a "lift and shift" to the cloud.
 - **Risk Management**: The Strangler Fig pattern is the gold standard for reducing migration risk.
@@ -370,16 +465,18 @@ Potential future enhancements include:
 
 ---
 
-## 12. Technologies Stack
+## 13. Technologies Stack
 
 - Google Kubernetes Engine (GKE)
 - Kubernetes (Deployments, Services, Ingress)
 - Docker
 - Google Artifact Registry
+- Prometheus
+- Grafana
 
 ---
 
-## 13. Target Audience
+## 14. Target Audience
 
 - Cloud Architects
 - Solution Architects
@@ -387,6 +484,6 @@ Potential future enhancements include:
 - Technical interviewers evaluating system design and architectural decision-making
 - Engineers interested in enterprise-grade cloud architecture patterns
 
-## 14. License
+## 15. License
 
 This project is licensed under the MIT License.
