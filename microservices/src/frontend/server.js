@@ -1,9 +1,13 @@
 const express = require("express");
 const path = require("path");
+const { createProxyMiddleware } = require("http-proxy-middleware");
 const client = require("prom-client");
 const app = express();
 const port = process.env.PORT || 8080;
 const serviceName = "frontend";
+const ordersUpstream = process.env.ORDERS_UPSTREAM || "http://orders:8081";
+const productsUpstream =
+  process.env.PRODUCTS_UPSTREAM || "http://products:8082";
 
 client.collectDefaultMetrics({ prefix: `${serviceName}_` });
 
@@ -34,6 +38,27 @@ app.get("/metrics", async (req, res) => {
 });
 
 app.get("/healthz", (req, res) => res.status(200).json({ status: "ok" }));
+
+// Local compose does not include an ingress, so frontend proxies API paths.
+app.use(
+  "/api/orders",
+  createProxyMiddleware({
+    target: ordersUpstream,
+    changeOrigin: true,
+    pathRewrite: (path) =>
+      path === "/" ? "/api/orders" : `/api/orders${path}`,
+  }),
+);
+
+app.use(
+  "/api/products",
+  createProxyMiddleware({
+    target: productsUpstream,
+    changeOrigin: true,
+    pathRewrite: (path) =>
+      path === "/" ? "/api/products" : `/api/products${path}`,
+  }),
+);
 
 //Serve website
 app.use(express.static(path.join(__dirname, "public")));

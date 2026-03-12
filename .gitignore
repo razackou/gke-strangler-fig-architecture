@@ -10,15 +10,12 @@
 
 #commit -m "adding basic prometheus and grafana monitoring" march 12 (thursday)  
 /k8s/monitoring/monitoring.yml
+/assets/prometheus-grafana-monitoring-dashboard.png
+/assets/prometheus-targets-page.png
 
 #commit -m “adding docker-compose file for local testing” on march 13th (friday) 
 docker-compose.yml
 /assets/microservices-docker-compose-up.png
-/assets/prometheus-grafana-monitoring-dashboard.png
-
-#commit -m "migrate products service from Node.js to FastAPI" on march 14th (saturday)
-buildx build --push -t northamerica-northeast1-docker.pkg.dev/gke-strangler-fig-architecture/reporazakou/products:2.0 .
-
 
 #Review and correct the README file to reflect the project 
 #commit -m “adding screenshots to README”  (march 15, sunday)
@@ -28,5 +25,6 @@ buildx build --push -t northamerica-northeast1-docker.pkg.dev/gke-strangler-fig-
 /assets/ingress.png
 /assets/kubernetes-monitoring-health-snapshot.png
 /assets/kubernetes-workload-health-snapshot.png
-/assets/prometheus-targets-page.png
+
+
 #commit -m “Finalizing README”  (march 16, Monday)

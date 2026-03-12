@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: products
-          image: northamerica-northeast1-docker.pkg.dev/gke-strangler-fig-architecture/reporazakou/products:1.0
+          image: northamerica-northeast1-docker.pkg.dev/gke-strangler-fig-architecture/reporazakou/products:2.2
           imagePullPolicy: Always
           ports:
             - containerPort: 8082

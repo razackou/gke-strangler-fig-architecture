@@ -1,17 +1,15 @@
-FROM node:24-bookworm-slim
+FROM python:3.11-slim
 
-# Create app directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
+ENV PYTHONDONTWRITEBYTECODE=1 \
+	PYTHONUNBUFFERED=1
 
-RUN npm ci --omit=dev
+COPY requirements.txt ./
 
-# Bundle app source
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
 EXPOSE 8082
-CMD [ "node", "server.js" ]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8082"]
