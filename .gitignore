@@ -7,10 +7,6 @@
 /logs
 
 
-#commit -m "adding basic prometheus and grafana monitoring" on march 15 (sunday)  
-/k8s/monitoring/monitoring.yml
-/assets/prometheus-grafana-monitoring-dashboard.png
-/assets/prometheus-targets-page.png
 
 #Review and correct the README file to reflect the project 
 #commit -m “adding screenshots to project on march 16 (Monday)
