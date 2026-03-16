@@ -149,7 +149,6 @@ graph TD
         end
     end
 
-    %% Styling (high-contrast for readability)
     style GKE_Cluster fill:#f8fbff,stroke:#1f6feb,stroke-width:2px,color:#0b1f33
     style Modern_Stack fill:#eefaf2,stroke:#1a7f37,stroke-width:1px,color:#0f2a1a
     style Legacy_Stack fill:#fff4e5,stroke:#b45309,stroke-width:1px,color:#3f2a00
@@ -229,22 +228,18 @@ graph TB
         Registry[(Google Artifact Registry)]
     end
 
-    %% Routing Logic
     Ingress -- "path: /" --> SVC_Front
     Ingress -- "path: /api/orders" --> SVC_Orders
     Ingress -- "path: /api/products" --> SVC_Products
 
-    %% Service to Pod Mapping
     SVC_Front --> Pod_Front
     SVC_Orders --> Pod_Orders
     SVC_Products --> Pod_Products
 
-    %% Image Pulls
     Registry -.-> Pod_Front
     Registry -.-> Pod_Orders
     Registry -.-> Pod_Products
 
-    %% Styling (high-contrast for readability)
     style GCP_Cloud fill:#f7f8fa,stroke:#4285f4,stroke-width:2px,color:#0b1f33
     style GKE_Cluster fill:#f8fbff,stroke:#1f6feb,stroke-width:2px,color:#0b1f33
     style Services_Layer fill:#eef6ff,stroke:#1f6feb,stroke-width:1px,color:#0b1f33
@@ -404,8 +399,6 @@ Potential future enhancements include:
 
 ## 11. Evidence and Screenshots
 
-<!--
-
 ### 11.1 Platform and Deployment State
 
 Monolith running on GKE baseline:
@@ -461,9 +454,6 @@ Grafana monitoring dashboard:
 Monitoring namespace health snapshot:
 
 <img src="assets/kubernetes-monitoring-health-snapshot.png" alt="Monitoring Health Snapshot" width="574" height="111">
--->
-
----
 
 ## 12. Key Takeaways
 
