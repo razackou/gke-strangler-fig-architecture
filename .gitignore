@@ -7,18 +7,13 @@
 /logs
 
 
-
-#commit -m "adding basic prometheus and grafana monitoring" march 12 (thursday)  
+#commit -m "adding basic prometheus and grafana monitoring" on march 15 (sunday)  
 /k8s/monitoring/monitoring.yml
 /assets/prometheus-grafana-monitoring-dashboard.png
 /assets/prometheus-targets-page.png
 
-#commit -m “adding docker-compose file for local testing” on march 13th (friday) 
-docker-compose.yml
-/assets/microservices-docker-compose-up.png
-
 #Review and correct the README file to reflect the project 
-#commit -m “adding screenshots to README”  (march 15, sunday)
+#commit -m “adding screenshots to project on march 16 (Monday)
 /assets/app-api-route-call.png
 /assets/app-frontend-loads.png
 /assets/google-artifact-registry.png
@@ -27,4 +22,4 @@ docker-compose.yml
 /assets/kubernetes-workload-health-snapshot.png
 
 
-#commit -m “Finalizing README”  (march 16, Monday)
+#commit -m “Finalizing README”  march 16 (Monday)(remove comments)

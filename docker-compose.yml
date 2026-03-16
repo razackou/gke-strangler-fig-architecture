@@ -1,0 +1,39 @@
+name: strangler-local
+
+services:
+  orders:
+    build:
+      context: ./microservices/src/orders
+    container_name: orders-ms
+    environment:
+      - PORT=8081
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+
+  products:
+    build:
+      context: ./microservices/src/products
+    container_name: products-ms
+    environment:
+      - PORT=8082
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./microservices/src/frontend
+    container_name: frontend-ms
+    environment:
+      - PORT=8080
+    depends_on:
+      - orders
+      - products
+    ports:
+      - "8080:8080"
+    volumes:
+      # Frontend server expects static assets at /usr/src/app/public.
+      # Build them first from react-app, then compose serves them.
+      - ./react-app/build:/usr/src/app/public:ro
+    restart: unless-stopped

@@ -110,7 +110,7 @@ sequenceDiagram
     FastAPI-->>Ingress: JSON Response (Status: 200)
     deactivate FastAPI
 
-    Ingress-->>Browser: JSON Data (PRD-XXX-FASTAPI)
+    Ingress-->>Browser: JSON Array of Products (200 OK)
 
     Note over Browser: Existing UI consumes the same API contract
 ```
@@ -121,7 +121,7 @@ The Strangler Fig Transition
 
 1. Containerize the Monolith: Replatform the existing application onto Kubernetes as the initial baseline.
 2. Extract Domains: Decouple one business capability (e.g., Orders) at a time into its own microservice.
-3. Shift Traffic: Gradually reroute requests from the monolith to the new service using an Ingress controller or service mesh.
+3. Shift Traffic: Gradually reroute requests from the monolith to the new service using an Ingress controller.
 4. Validate and Stabilize: Monitor performance, logs, and user impact in the live environment before proceeding.
 5. Decommission Legacy Components: Repeat the process until the monolithic core is fully retired.
 
@@ -195,7 +195,8 @@ class Product(BaseModel):
 The GKE Ingress controller acts as the routing engine. By applying path-based rules, traffic is incrementally diverted:
 
 1. Default Rule (`/`): Routes to the Frontend service.
-2. Specific Rule (`/api/products`): Routes to the new FastAPI Products microservice.
+2. Specific Rule (`/api/orders`): Routes to the new Node.js Orders microservice.
+3. Specific Rule (`/api/products`): Routes to the new FastAPI Products microservice.
 
 ---
 
@@ -218,9 +219,9 @@ graph TB
             end
 
             subgraph Pods_Layer [Compute Layer - Distributed]
-                Pod_Front[Pods: Frontend / Node.js]
+                Pod_Front[Pods: Frontend / React]
                 Pod_Orders[Pods: Orders / Node.js]
-                Pod_Products[Pods: Products / FastAPI Python]
+                Pod_Products[Pods: Products / FastAPI]
             end
 
         end
