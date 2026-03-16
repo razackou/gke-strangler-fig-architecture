@@ -9,13 +9,7 @@
 
 
 #Review and correct the README file to reflect the project 
-#commit -m “adding screenshots to project on march 16 (Monday)
-/assets/app-api-route-call.png
-/assets/app-frontend-loads.png
-/assets/google-artifact-registry.png
-/assets/ingress.png
-/assets/kubernetes-monitoring-health-snapshot.png
-/assets/kubernetes-workload-health-snapshot.png
+
 
 
 #commit -m “Finalizing README”  march 16 (Monday)(remove comments)
